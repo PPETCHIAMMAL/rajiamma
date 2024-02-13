@@ -1,0 +1,238 @@
+using DietBo;
+using userDao.CreditException;
+using DietVo;
+using Serilog;
+
+namespace UserService
+{
+    public class Userservice
+    {
+        static void Main(string[] args)
+        { }
+        ResponseObject res = new ResponseObject();
+        Dietbo bo = new Dietbo();
+        user vo = new user();
+
+
+
+
+        public ResponseObject AddUser(user vo)
+        {
+            res.SetSuccessMessage("");
+            res.SetFailureMessage("");
+            res.setStatus(false);
+
+            bool flag = false;
+
+            try
+            {
+
+                if (vo != null)
+                {
+                    flag = bo.InsertUser(vo);
+
+                    if (flag)
+                    {
+                        res.SetUser(vo);
+                        res.SetSuccessMessage($"user record  insert successfully ");
+                        Log.Information($"user record  created successfully {res.GetUser().ToString()}");
+
+                        user c = res.GetUser();
+
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                res.SetFailureMessage("user record insert  doesn't completed !!");
+                Log.Error(ex, $"Error while creating record for user {vo.user_id}");
+            }
+            return res;
+
+        }
+
+
+        public ResponseObject FetchUser(long user_id)
+        {
+
+          user c = null;
+
+            try
+            {
+                res.SetSuccessMessage("");
+                res.SetFailureMessage("");
+                res.setStatus(false);
+
+                List<user> list = bo.GetUsers();
+
+                int chk = 0;
+
+                foreach (user user in list)
+                {
+                    if (user.user_id == user_id && user.user_id != 0)
+                    {
+                        c = bo.GetUser(user_id);
+                        chk = 1;
+                        break;
+
+                    }
+                }
+
+                if (chk == 0 && user_id > 0)
+                {
+                    Log.Information($"GetUsers with Id {user_id} Not found");
+                    throw new UserReadException("user Id doen't exits - Please Check and Enter Again !!");
+
+                }
+
+                else if (chk == 0 && user_id == 0)
+                {
+                    Log.Information($"user Record can't be 0 ");
+                    throw new UserReadException("user Id can't be Zero - Please Check and Enter Again !!");
+
+                }
+                else if (c == null && chk == 1)
+                {
+                    Log.Information($"user Record with Id {user_id} Not found");
+                    throw new UserReadException("Server Error - Report To Admin !!");
+                }
+                else
+                {
+
+
+                    res.SetUser(c);
+
+                    res.SetSuccessMessage($"user Record retrieved successfully ");
+
+                    Log.Information($"user Record retrived successfully {res.GetUser().ToString()}");
+                    //Console.WriteLine(res.GetUser().ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                res.SetFailureMessage("user Record doesn't found - Contact Admin !!");
+                Log.Error(ex, $"Error while retrieving record for user {vo.user_id}");
+            }
+            return res;
+
+        }
+
+        public ResponseObject FetchAllUsers()
+        {
+
+            List<user> users;
+
+            try
+            {
+                res.SetSuccessMessage("");
+                res.SetFailureMessage("");
+                res.setStatus(false);
+                users = bo.GetUsers();
+                res.SetUsers(users);
+
+
+                res.SetSuccessMessage($"user Record retrieved successfully ");
+                Log.Information($"user Record table displayed successfully");
+
+
+                //   Console.WriteLine(user.ToString());
+
+            }
+            catch (Exception ex)
+            {
+                res.SetFailureMessage("Error Occured while retrieving user Record");
+                Log.Error(ex, $"Error while retrieving user Record table ");
+            }
+            return res;
+
+        }
+
+        public ResponseObject UpdateUser(long user_id, string userInfo, int opt)
+        {
+            res.SetSuccessMessage("");
+            res.SetFailureMessage("");
+            res.setStatus(false);
+            bool flag = false;
+
+            try
+            {
+
+
+                if (res.GetUser() == null)
+                {
+                    throw new UserUpdationException("user Id doen't exits - Please Check and Enter Again !!");
+                }
+
+                user user = bo.GetUser(user_id);
+                res.SetUser(user);
+                res.setStatus(false);
+
+                flag = bo.EditUser(user_id, userInfo, opt);
+
+                if (flag == true)
+                {
+                    user user1 = bo.GetUser(user_id);
+                    res.SetUser(user1);
+                    res.setStatus(true);
+                    res.SetSuccessMessage($"user record  Updated successfully ");
+                    Log.Information($"user record  updated successfully {res.GetUser().ToString()}");
+                }
+                else
+                {
+                    flag = false;
+                    throw new UserUpdationException("No fields can't be NULL !! ");
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+
+                res.SetFailureMessage("Error Occured while Updating user record ");
+                Log.Error(ex, $"Error while updating a record for user record  ");
+
+            }
+
+            return res;
+
+        }
+
+
+        public ResponseObject DeleteUser(long user_id)
+        {
+
+            bool flag;
+
+            res.SetSuccessMessage("");
+            res.SetFailureMessage("");
+            res.setStatus(false);
+
+            try
+            {
+                flag = bo.RemoveUser(user_id);
+                if (flag == true)
+                {
+                    res.SetSuccessMessage($"user record  Deleted successfully ");
+                    Log.Information($"user record  deleted successfully {user_id}");
+                }
+                else
+                {
+                    res.SetFailureMessage($"user record  can't be deleted");
+                }
+            }
+            catch (Exception ex)
+            {
+                res.SetFailureMessage("Error Occured while Deleting user");
+                Log.Error(ex, $"Error while removing the user  {user_id}");
+            }
+
+            return res;
+
+        }
+
+
+
+    }
+}
