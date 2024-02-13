@@ -1,0 +1,36 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CreditVo
+{
+    public class Diet
+
+    {
+        static void Main(string[] args) { }
+        public long user_id
+        {
+            get; set;
+        }
+        public int age
+        {
+            get; set;
+        }
+        public long weight
+        {
+            get; set;
+        }
+        public string gender
+        {
+            get; set;
+        }
+        public override string ToString()
+        {
+            return ($"user_id = {user_id}, age = {age}, weight = {weight}, gender = {gender}");
+
+        }
+    }
+}
