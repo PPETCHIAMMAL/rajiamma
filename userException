@@ -1,0 +1,24 @@
+using System.Runtime.Serialization;
+
+namespace DietBo
+{
+    [Serializable]
+    internal class userException : Exception
+    {
+        public userException()
+        {
+        }
+
+        public userException(string? message) : base(message)
+        {
+        }
+
+        public userException(string? message, Exception? innerException) : base(message, innerException)
+        {
+        }
+
+        protected userException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
+}
