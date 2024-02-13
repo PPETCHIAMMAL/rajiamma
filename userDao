@@ -1,0 +1,291 @@
+using userDao.UserException;
+using DietVo;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace userDao.UserAdoDao;
+
+public class userDao : IuserDao
+{
+
+    public bool storeuserDetails(user c)
+    {
+        bool flag = false;
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(UserConst.connectionString))
+            {
+                connection.Open();
+
+
+                string query = "INSERT INTO user (user_id, age, weight,gender) VALUES (@user_id, @age, @weight,@gender)";
+
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+
+                    cmd.Parameters.AddWithValue("@user_id", c.user_id);
+                    cmd.Parameters.AddWithValue("@age", c.age);
+                    cmd.Parameters.AddWithValue("@weight", c.weight);
+                    cmd.Parameters.AddWithValue("@gender", c.gender);
+
+
+                    int r = cmd.ExecuteNonQuery();
+                    if (r > 0)
+                        flag = true;
+                    else
+                        throw new UserCreationException("Exception caused while creating a user");
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            throw new UserCreationException(ex);
+        }
+
+        return flag;
+    }
+
+
+    public user fetchuserDetails(long user_id)
+    {
+        user c = new user();
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(UserConst.connectionString))
+            {
+                connection.Open();
+
+                string query = "SELECT user_id, age, weight,gender FROM user WHERE  user_id = @user_id ;";
+
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@user_id", user_id);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+
+
+                    if (reader.Read())
+                    {
+                        c.user_id = reader.GetInt64(0);
+                        c.age = reader.GetInt32(1);
+                        c.weight = reader.GetInt64(2);
+                        c.gender = reader.GetString(3);
+
+                    }
+                    if (!(reader.HasRows))
+                    {
+                        Console.WriteLine("user Id Not Found");
+                        throw new UserReadException("Exception caused while reading a user records");
+                    }
+
+                    reader.Close();
+
+
+                }
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+            //Console.WriteLine($"Error: {ex.Message}");
+            throw new UserReadException(ex);
+        }
+        return c;
+    }
+
+
+
+    public List<user> fetchallusers()
+    {
+        List<user> users = new List<user>();
+        try
+        {
+
+            using (SqlConnection connection = new SqlConnection(UserConst.connectionString))
+            {
+                connection.Open();
+
+                string query = "SELECT user_id , age , weight , gender  FROM user;";
+
+
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+
+                    using (SqlDataAdapter cda = new SqlDataAdapter())
+                    {
+                        cda.SelectCommand = cmd;
+
+
+                        DataSet ds = new DataSet();
+
+                        cda.Fill(ds, "Credit");
+
+
+
+                        foreach (DataRow d in ds.Tables["user"].Rows)
+                        {
+                            user c = new user();
+                            c.user_id = Convert.ToInt64(d["user_id"]);
+                            c.age = Convert.ToInt32(d["age"]);
+                            c.weight = Convert.ToInt64(d["weight"]);
+                            c.gender = Convert.ToString(d["gender"]);
+
+
+                            users.Add(c);
+                        }
+                        if (ds == null)
+                        {
+                            Console.WriteLine("users Not Found");
+                            throw new UserReadException("Exception caused while displaying user table ");
+
+                        }
+
+                    }
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw new UserReadException(ex);
+
+        }
+
+        return users;
+
+    }
+
+
+    public bool updateuserDetails(long user_id, string userInfo, int opt)
+    {
+        bool flag = false;
+
+
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(CreditDaoConstants.connectionString))
+            {
+                connection.Open();
+
+
+                switch (opt)
+                {
+
+                    case 1:
+                        {
+
+                            using (SqlCommand cmd = new SqlCommand("UPDATE user SET age = @age WHERE user_id =  @user_id; ", connection))
+                            {
+                                cmd.Parameters.AddWithValue("@creditcard_id", user_id);
+                                cmd.Parameters.AddWithValue("@cvv", Convert.ToInt16(userInfo));
+                                int r = cmd.ExecuteNonQuery();
+                                if (r > 0)
+                                    flag = true;
+                                else
+                                    throw new UserUpdationException("Invalid age !! \nException caused while updating user record ");
+                            }
+                            break;
+
+                        }
+
+                    case 2:
+                        {
+
+                            using (SqlCommand cmd = new SqlCommand("UPDATE user SET weight = @weight WHERE user_id  =  @user_id  ; ", connection))
+                            {
+                                cmd.Parameters.AddWithValue("@user_id  ", user_id);
+                                cmd.Parameters.AddWithValue("@weight", Convert.ToInt64(userInfo));
+                                int r = cmd.ExecuteNonQuery();
+                                if (r > 0)
+                                    flag = true;
+                                else
+                                    throw new UserUpdationException("Invalid weight!! \nException caused while updating user record ");
+                            }
+                            break;
+
+                        }
+                    case 3:
+                        {
+                            using (SqlCommand cmd = new SqlCommand("UPDATE user SET gender = @gender  WHERE user_id =  @user_id; ", connection))
+                            {
+                                cmd.Parameters.AddWithValue("@user_id", user_id);
+                                cmd.Parameters.AddWithValue("@gender", userInfo);
+                                int r = cmd.ExecuteNonQuery();
+                                if (r > 0)
+                                    flag = true;
+                                else
+                                    throw new UserUpdationException("Invalid gender !! \nException caused while updating user record ");
+                            }
+                            break;
+
+                        }
+
+
+
+
+
+                    default:
+                        {
+                            throw new UserUpdationException("Invalid Choice !! \nException caused while updating user record ");
+                            break;
+                        }
+                }
+
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new UserUpdationException(ex);
+
+        }
+        return flag;
+
+    }
+
+
+    public bool deleteuserDetails(long user_id)
+    {
+        bool flag = false;
+
+        try
+        {
+            using (SqlConnection connection = new SqlConnection(userConst.connectionString))
+            {
+                connection.Open();
+
+                using (SqlCommand cmd = new SqlCommand("DELETE FROM user WHERE user_id =  @user_id; ", connection))
+                {
+                    cmd.Parameters.AddWithValue("@creditcard_id", user_id);
+                    int r = cmd.ExecuteNonQuery();
+                    if (r > 0)
+                        flag = true;
+                    else
+                        throw new UserDeletionException("Exception caused while deleting a user record ");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new UserDeletionException(ex);
+
+        }
+
+        return flag;
+    }
+
+    //public bool storeuserDetails(Credit C)
+    // {
+    //    throw new NotImplementedException();
+    // }
+
+
+}
