@@ -1,0 +1,72 @@
+using DietVo;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace UserService
+{
+    public class ResponseObject
+    {
+        private bool flag = false;
+        private string success;
+        private string failure;
+        private List<user> users;
+
+        public List<user> GetUsers()
+        {
+            return users;
+        }
+
+        public bool getStatus()
+        { return flag; }
+
+        public void setStatus(bool flag)
+        { this.flag = flag; }
+
+        public void SetUsers(List<user> c)
+        {
+            users = c;
+            flag = true;
+        }
+
+        public string GetSuccessMessage()
+        {
+            return success;
+        }
+
+        public void SetFailureMessage(String str)
+        {
+            failure = str;
+
+        }
+
+        public string GetFailureMessage()
+        {
+            return failure;
+        }
+
+        public void SetSuccessMessage(String str)
+        {
+            success = str;
+            flag = true;
+        }
+
+
+        private user vo;
+
+
+        public user GetUser()
+        {
+            return vo;
+        }
+
+        public void SetUser(user c)
+        {
+            vo = c;
+            flag = true;
+        }
+
+    }
+}
