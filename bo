@@ -1,0 +1,198 @@
+using DietDao.DietAdoDao;
+using DietDao.DietException;
+using DietVo;
+using System.Text.RegularExpressions;
+using userDao.userException;
+
+namespace DietBo
+{
+    public class Dietbo
+    {
+        static void Main(string[] args) { }
+
+        Dietdao da = new Dietdao();
+        public bool InsertUser(user c)
+        {
+
+            bool flag = false, R1 = false, R4 = false;
+            try
+            {
+                if (c.user_id == null || c.age == null || c.weight == null || c.gender == null)
+                    throw new userException("No fields can't be NULL !! ");
+
+
+                // Duplicate ID
+
+                List<user> list = da.fetchallusers();
+
+                foreach (user user in list)
+                {
+                    if (user.user_id == c.user_id)
+                    {
+                        throw new userException("Id Already Found - Duplicate Id Not Allowed !! \n ");
+                    }
+                }
+                if (c.user_id == 0)
+                    throw new userException("user_Id can't be Zero [0] - Retry with other Id \n ");
+
+                R4 = true;
+
+
+
+
+                // credit card id
+
+                long user_id = Convert.ToString(c.user_id).Length;
+
+                if (user_id == 2)
+                {
+                    R1 = true;
+
+                }
+                else if (user_id > 2 || user_id < 2)
+                {
+                    throw new UserCreationException("Enter a 2 digit user id number");
+                }
+                //cvv
+
+                int age = Convert.ToString(c.age).Length;
+
+                if (age == 2)
+                {
+                    R1 = true;
+
+                }
+                else
+
+                    throw new UserCreationException("Enter age");
+
+
+                if (R1 && R4)
+                    flag = da.storeuserDetails(c);
+            }
+
+            catch (Exception e)
+            {
+                throw new UserReadException(e);
+
+            }
+            return flag;
+        }
+
+
+
+        public user GetUser(long user_id)
+        {
+            user c = null;
+
+            int chk = 0;
+            try
+            {
+                List<user> list = da.fetchallusers();
+
+                foreach (user user in list)
+                {
+                    if (user.user_id == user_id && user.user_id != 0)
+                    {
+
+                        c = da.fetchuserDetails(user_id);
+                        chk = 1;
+                        break;
+
+                    }
+                }
+                if (chk == 0)
+                    throw new UserReadException("user_id doen't exits - Please Check and Enter Again !!");
+                if (c == null)
+                    throw new UserReadException("Server Error - Report To Admin !!");
+
+            }
+            catch (Exception e)
+            {
+                throw new UserReadException(e);
+
+            }
+            return c;
+
+        }
+
+        public List<user> GetUsers()
+        {
+
+            List<user> list = da.fetchallusers();
+            return list;
+        }
+
+        public bool EditUser(long user_id, string userInfo, int opt)
+        {
+            bool flag = false;
+
+
+            List<user> list = da.fetchallusers();
+            int chk = 0;
+            try
+
+            {
+                foreach (user c in list)
+                {
+                    if (c.user_id == user_id && c.user_id != 0)
+                    {
+                        flag = da.updateuserDetails(user_id, userInfo, opt);
+                        chk = 1;
+                        break;
+                    }
+
+                }
+                if (chk == 0)
+                    throw new UserUpdationException("user Id doen't exits - Please Check and Enter Again !!");
+                if (flag == false && chk == 1)
+                    throw new UserUpdationException("Server Error - Report To Admin !!\"");
+
+
+            }
+            catch (Exception e)
+            {
+                //Console.WriteLine(e.Message);
+                throw new UserUpdationException(e);
+
+            }
+            return flag;
+
+        }
+
+
+        public bool RemoveUser(long user_id)
+        {
+            bool flag = false;
+
+            List<user> list = da.fetchallusers();
+            int chk = 0;
+            try
+            {
+                foreach (user c in list)
+                {
+                    if (c.user_id == user_id)
+                    {
+                        flag = da.deleteuserDetails(user_id);
+                        chk = 1;
+                        break;
+                    }
+                }
+                if (chk == 0)
+                    throw new UserDeletionException("user Id doen't exits - Please Check and Enter Again !!");
+                if (flag == false && chk == 1)
+                    throw new UserDeletionException("Server Error - Report To Admin !!\"");
+            }
+            catch (Exception e)
+            {
+                throw new UserDeletionException(e);
+            }
+
+            return flag;
+        }
+
+
+    }
+
+   
+}
