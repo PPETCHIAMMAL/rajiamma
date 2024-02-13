@@ -1,0 +1,18 @@
+using System.Threading.Tasks;
+
+namespace userDao.UserAdoDao
+{
+    public interface IuserDao
+    {
+        public bool storeuserDetails(user C);
+
+        public user fetchuserDetails(long user_id);
+
+        public List<user> fetchallusers();
+
+        public bool updateuserDetails(long user_id, string userInfo, int opt);
+
+        public bool deleteuserDetails(long user_id);
+
+    }
+}
