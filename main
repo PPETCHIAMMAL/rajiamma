@@ -1,0 +1,223 @@
+using CommonUtility;
+using DietBo;
+using DietService;
+using DietVo;
+using Serilog;
+
+namespace DietTrackerApplication;
+
+public class DietTrackerApplicationMain
+{
+
+
+    static void Main(string[] args)
+    {
+
+        Dietservice cms = new Dietservice();
+        Diet vo = new Diet();
+        ResponseObject res = new ResponseObject();
+        Dietbo bo = new Dietbo();
+        DietLogger logger = new DietLogger();
+
+        logger.BuildConfigure();
+        Log.Information("Diet Tracker  Application Started ...... ");
+
+        while (true)
+        {
+
+            Console.WriteLine("============================================================================================================================================================");
+            Console.WriteLine("                                                             CUI - InsuRex [ Diet Tracker application ]                                                     ");
+            Console.WriteLine("============================================================================================================================================================");
+            Console.WriteLine("-------------------------------------------------------------            Menu              -----------------------------------------------------------------");
+            Console.WriteLine(" 1. Add records");
+            Console.WriteLine(" 2. Display  records");
+            Console.WriteLine(" 3. FetchAll records ");
+            Console.WriteLine(" 4. Update records");
+            Console.WriteLine(" 5. Delete  records ");
+            Console.WriteLine(" 6. Exit from App ");
+            Console.Write(" \nEnter a Option : ");
+
+
+            int opt = int.Parse(Console.ReadLine());
+
+            switch (opt)
+            {
+                case 1:
+                    {
+
+                        try
+                        {
+                            Console.Write("Enter user ID               : ");
+                            vo.user_id = long.Parse(Console.ReadLine());
+
+                            Console.Write("Enter age     : ");
+                            vo.age= int.Parse(Console.ReadLine());
+
+                            Console.Write("Enter weight      : ");
+                            vo.weight = long.Parse(Console.ReadLine());
+
+                            Console.Write("Enter gender       : ");
+                            vo.gender = Console.ReadLine();
+
+
+                            res = cms.AddUser(vo);
+
+                            if (res.getStatus() == true)
+                                Console.WriteLine(res.GetSuccessMessage());
+                            else
+                                Console.WriteLine(res.GetFailureMessage());
+
+                            Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------------");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error: {ex.Message}");
+
+                        }
+                        break;
+                    }
+                case 2:
+                    {
+                        Console.Write("Enter user ID             : ");
+                        long user_id = long.Parse(Console.ReadLine());
+
+                        res = cms.FetchCredit(user_id);
+
+                        if (res.getStatus() == true)
+                        {
+
+
+
+                            user c = res.GetUser();
+
+                            Console.WriteLine("____________________");
+                            Console.WriteLine("user_id   age    weight       gender   ");
+                            Console.WriteLine("---------|------------|--------------|-----------|-------");
+                            Console.WriteLine($"  {c.user_id}\t   {c.age}   \t{c.weight}  \t{c.gender} ");
+
+                            Console.WriteLine("_________________________");
+
+                            Console.WriteLine(res.GetSuccessMessage());
+                        }
+                        else
+                            Console.WriteLine(res.GetFailureMessage());
+
+                        Console.WriteLine("------------------------------------------------------------------------------");
+
+                        break;
+
+
+                    }
+                case 3:
+                    {
+                        res = cms.FetchAllUsers();
+                        if (res.getStatus() == true)
+                        {
+                            List<user> users = res.GetUsers();
+
+                            foreach (user c in users)
+                            {
+                                Console.WriteLine("____________________");
+                                Console.WriteLine("user_id   age    weight       gender   ");
+                                Console.WriteLine("---------|------------|--------------|-----------|-------");
+                                Console.WriteLine($"  {c.userid}\t   {c.age}   \t{c.weight}  \t{c.gender} ");
+
+                                Console.WriteLine("_________________________");
+
+                            }
+                            Console.WriteLine();
+
+                            Console.WriteLine(res.GetSuccessMessage());
+                        }
+                        Console.WriteLine(res.GetFailureMessage());
+
+
+                        Console.WriteLine("-----------------------------------------------------------------------------------------------------------------------------------------------------");
+
+                        break;
+                    }
+                case 4:
+                    {
+                        Console.Write("Enter user ID             : ");
+                        long user_id = long.Parse(Console.ReadLine());
+                        //Console.WriteLine(res.getStatus());
+
+
+                        Console.WriteLine(" Choose the Info to be updated");
+                        Console.WriteLine(" Type 1  - user age");
+                        Console.WriteLine(" Type 2  - Weight");
+                        Console.WriteLine(" Type 3  - gender");
+
+                        Console.Write("Enter Option : ");
+                        int op = int.Parse(Console.ReadLine());
+
+                        switch (op)
+                        {
+                            case 1: Console.Write("Enter user  age : "); break;
+                            case 2: Console.Write("Enter user weight : "); break;
+                            case 3: Console.Write("Enter  gender : "); break;
+
+                        }
+
+                        res = cms.FetchUser(user_id);
+
+
+                        string userInfo = Console.ReadLine();
+
+                        if (res.getStatus())
+                        {
+                            Console.WriteLine("user profile BEFORE Update ");
+                            Console.WriteLine("-----------------------------");
+                            Console.WriteLine(res.GetUser().ToString());
+                            Console.WriteLine();
+
+                            res = cms.UpdateUser(user_id, userInfo, op);
+
+
+                            Console.WriteLine("user profilr AFTER Update ");
+                            Console.WriteLine("-----------------------------");
+                            Console.WriteLine(res.GetUser().ToString());
+                            Console.WriteLine();
+
+                            Console.WriteLine(res.GetSuccessMessage());
+                        }
+                        else
+                            Console.WriteLine(res.GetFailureMessage());
+
+
+                        Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+                        break;
+                    }
+                case 5:
+                    {
+                        Console.Write("Enter user ID             : ");
+                        long user_id = long.Parse(Console.ReadLine());
+
+                        res = cms.DeleteUser(user_id);
+                        if (res.getStatus() == true)
+                            Console.WriteLine(res.GetSuccessMessage());
+                        else
+                            Console.WriteLine(res.GetFailureMessage());
+
+                        Console.WriteLine("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+                        break;
+                    }
+                case 6:
+                    {
+
+                        Console.WriteLine("===================================================================                               ==========================================================");
+                        Console.WriteLine("===================================================================        THANK YOU !!           ==========================================================");
+
+                        Log.Information("............Diet Tracker Application Ended ");
+                        Environment.Exit(0);
+                        break;
+                    }
+            }
+        }
+
+    }
+
+
+}
