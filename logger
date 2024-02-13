@@ -1,0 +1,36 @@
+using Microsoft.Extensions.Configuration;
+using Serilog.Sinks.File;
+using Serilog;
+
+namespace CommonUtility
+
+{
+    public class UserLogger
+    {
+
+
+        public void BuildConfigure()
+        {
+            var configuration = new ConfigurationBuilder()
+                           .AddJsonFile("appsettings.json").Build();
+
+            Log.Logger = new LoggerConfiguration().
+                    ReadFrom.Configuration(configuration)
+                    .UserLogger();
+
+
+
+
+
+        }
+
+       public static void Main(string[] args) {
+            var UserLogger = new UserLogger();
+            UserLogger.BuildConfigure();
+
+            // You might want to add logging calls here to test
+            Log.Information("This is a test log message.");
+        }
+
+    }
+}
