@@ -1,0 +1,32 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace userDao.userException
+{
+    [Serializable]
+    public class UserDeletionException : Exception
+    {
+        public UserDeletionException()
+        {
+        }
+        public UserDeletionException(Exception e)
+        {
+        }
+
+        public UserDeletionException(string? message) : base(message)
+        {
+        }
+
+        public UserDeletionException(string? message, Exception? innerException) : base(message, innerException)
+        {
+        }
+
+        protected UserDeletionException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
+}
