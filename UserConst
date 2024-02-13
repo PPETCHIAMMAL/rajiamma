@@ -1,0 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace userDao.UserAdoDao
+{
+    public interface UserConst
+    {
+        public const string connectionString = @"Data Source=DESKTOP-QI055HO\SQLEXPRESS;Initial Catalog=CreditCardApplication;Integrated Security=True;Encrypt=True;TrustServerCertificate=True";
+    }
+}
